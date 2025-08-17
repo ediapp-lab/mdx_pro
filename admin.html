@@ -1,0 +1,81 @@
+{% extends "layout.html" %}
+{% block content %}
+<h2>Admin dashboard</h2>
+{% if not session.get('is_admin') %}
+<form method="post" action="{{ url_for('admin_login') }}" class="form">
+  <label>Admin Email<input type="email" name="email" required></label>
+  <label>Password<input type="password" name="password" required></label>
+  <button class="btn" type="submit">Log in as Admin</button>
+</form>
+{% else %}
+<h3>Users</h3>
+<table class="table">
+  <tr><th>ID</th><th>Email</th><th>Confirmed</th><th>USDT</th><th>BTC</th><th>ETH</th><th>LTC</th><th>BNB</th><th>Set balance</th><th>Send code</th><th>Impersonate</th></tr>
+  {% for u in users %}
+  <tr>
+    <td>{{ u['id'] }}</td><td>{{ u['email'] }}</td><td>{{ '✅' if u['is_confirmed'] else '❌' }}</td>
+    <td>{{ '%.4f'|format(u['usdt']) }}</td><td>{{ '%.6f'|format(u['btc']) }}</td><td>{{ '%.6f'|format(u['eth']) }}</td>
+    <td>{{ '%.6f'|format(u['ltc']) }}</td><td>{{ '%.6f'|format(u['bnb']) }}</td>
+    <td>
+      <form method="post" action="{{ url_for('admin_set_balance') }}" class="inline">
+        <input type="hidden" name="user_id" value="{{ u['id'] }}">
+        <select name="field"><option value="usdt">USDT</option><option value="btc">BTC</option><option value="eth">ETH</option><option value="ltc">LTC</option><option value="bnb">BNB</option></select>
+        <input type="number" step="0.000001" name="amount" placeholder="amount">
+        <button class="btn small" type="submit">Set</button>
+      </form>
+    </td>
+    <td>
+      <form method="post" action="{{ url_for('admin_send_code') }}" class="inline">
+        <input type="hidden" name="email" value="{{ u['email'] }}">
+        <button class="btn small" type="submit">Send code</button>
+      </form>
+    </td>
+    <td>
+      <form method="get" action="{{ url_for('admin_impersonate') }}" class="inline">
+        <input type="hidden" name="user_id" value="{{ u['id'] }}">
+        <button class="btn small" type="submit">View</button>
+      </form>
+    </td>
+  </tr>
+  {% endfor %}
+</table>
+
+<div class="panel" style="margin:12px 0">
+  <h3>Live/Override data</h3>
+  <form method="post" action="{{ url_for('admin_override') }}" class="form">
+    <label>Symbol (e.g., BTCUSDT, ETHUSDT)<input name="symbol" required value="BTCUSDT"></label>
+    <label><input type="checkbox" name="active"> Use override instead of live Binance</label>
+    <label>Override candles (CSV t,o,h,l,c OR JSON list)</label>
+    <textarea name="data" rows="8" placeholder="1713288000000,65000,65120,64890,65050"></textarea>
+    <button class="btn" type="submit">Save override</button>
+  </form>
+</div>
+
+<div class="panel" style="margin:12px 0">
+  <h3>Exports & class tools</h3>
+  <a class="btn small" href="{{ url_for('export_actions_csv') }}">Export actions CSV</a>
+  <a class="btn small" href="{{ url_for('export_users_csv') }}">Export users CSV</a>
+  <form method="post" action="{{ url_for('admin_reset_class') }}" class="inline" onsubmit="return confirm('Reset all balances/logs?')">
+    <button class="btn small" type="submit">Reset class</button>
+  </form>
+</div>
+
+<h3>Recent activity (auto-updates)</h3>
+<table class="table" id="actionsTable">
+  <tr><th>Time</th><th>User</th><th>Kind</th><th>Detail</th></tr>
+  {% for a in actions %}
+  <tr><td>{{ a['created_at'] }}</td><td>{{ a['email'] }}</td><td>{{ a['kind'] }}</td><td>{{ a['detail'] }}</td></tr>
+  {% endfor %}
+</table>
+<script>
+async function refreshActions(){
+  const r = await fetch('/admin/json/actions');
+  const j = await r.json();
+  const table = document.getElementById('actionsTable');
+  table.innerHTML = '<tr><th>Time</th><th>User</th><th>Kind</th><th>Detail</th></tr>' + 
+    j.map(a=>`<tr><td>${a.created_at}</td><td>${a.email||''}</td><td>${a.kind}</td><td>${a.detail}</td></tr>`).join('');
+}
+setInterval(refreshActions, 5000);
+</script>
+{% endif %}
+{% endblock %}

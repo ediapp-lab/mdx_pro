@@ -1,0 +1,27 @@
+{% extends "layout.html" %}
+{% block content %}
+<h1>Market dynamics</h1>
+<div class="cards">
+  {% for sym in ['BTCUSDT','ETHUSDT','LTCUSDT','BNBUSDT'] %}
+  <div class="card">
+    <div class="card-title">{{ sym }}</div>
+    <div class="price" id="p-{{ sym }}">{{ prices[sym] and ('$'+('%.2f'|format(prices[sym]))) }}</div>
+    <canvas id="spark-{{ sym }}" height="60"></canvas>
+  </div>
+  {% endfor %}
+</div>
+<div class="cta"><a class="btn" href="{{ url_for('register') }}">Start your cryptocurrency journey</a></div>
+<script>
+async function drawSpark(symbol){
+  const res = await fetch(`/api/candles?symbol=${symbol}&interval=1m`);
+  const js = await res.json();
+  const prices = js.candles.map(d => ({x:d.t, y:d.c}));
+  new Chart(document.getElementById('spark-'+symbol), {
+    type: 'line',
+    data: {datasets:[{data:prices, pointRadius:0, borderWidth:1, fill:false}]},
+    options: {responsive:true, plugins:{legend:{display:false}}, scales:{x:{display:false}, y:{display:false}}}
+  });
+}
+['BTCUSDT','ETHUSDT','LTCUSDT','BNBUSDT'].forEach(drawSpark);
+</script>
+{% endblock %}

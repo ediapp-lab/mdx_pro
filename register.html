@@ -1,0 +1,10 @@
+{% extends "layout.html" %}
+{% block content %}
+<h2>Create account</h2>
+<form method="post" class="form">
+  <label>Email<input type="email" name="email" required></label>
+  <label>Password<input type="password" name="password" required></label>
+  <button class="btn" type="submit">Register</button>
+</form>
+<p>A 6-digit code will be sent to your email (or printed to the server console if email is not configured).</p>
+{% endblock %}

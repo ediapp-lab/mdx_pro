@@ -1,0 +1,31 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>{{ app_name }}</title>
+  <link rel="stylesheet" href="{{ url_for('send_static', path='styles.css') }}">
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/luxon@3"></script>
+  <script src="https://cdn.jsdelivr.net/npm/chartjs-adapter-luxon@1"></script>
+</head>
+<body>
+  <nav class="topbar" style="--primary: {{ primary or '#d3b057' }};">
+    <div class="brand"><img src="{{ url_for('send_static', path='logo-mdxxpro.svg') }}" alt="MDXX Pro" height="20"></div>
+    <div class="navlinks">
+      <a href="{{ url_for('home') }}">Home</a>
+      {% if session.get('user_id') and not session.get('is_admin') %}<a href="{{ url_for('student') }}">App</a>{% endif %}
+      {% if session.get('is_admin') %}<a href="{{ url_for('admin') }}">Admin</a>{% endif %}
+      {% if session.get('user_id') %}<a href="{{ url_for('logout') }}">Logout</a>{% else %}
+      <a href="{{ url_for('login') }}">Login</a><a href="{{ url_for('register') }}">Register</a>{% endif %}
+    </div>
+  </nav>
+  <main class="container">
+    {% with messages = get_flashed_messages(with_categories=true) %}
+      {% if messages %}<div class="flashwrap">{% for category, message in messages %}<div class="flash {{ category }}">{{ message }}</div>{% endfor %}</div>{% endif %}
+    {% endwith %}
+    {% block content %}{% endblock %}
+  </main>
+  <footer class="footer">MDXX Pro — classroom simulator. Live data by Binance (when not overridden). Not financial advice.</footer>
+</body>
+</html>

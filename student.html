@@ -1,0 +1,52 @@
+{% extends "layout.html" %}
+{% block content %}
+<h2>Instant Spot Trading</h2>
+<div class="trade-grid">
+  <div class="panel">
+    <div class="bal">Available: {{ '%.2f'|format(balances['usdt']) }} USDT</div>
+    <label>Symbol (USDT pairs) <select id="symbol">
+      <option>BTCUSDT</option><option>ETHUSDT</option><option>LTCUSDT</option><option>BNBUSDT</option>
+    </select></label>
+    <label>Side <select id="side"><option>BUY</option><option>SELL</option></select></label>
+    <label>Quantity (base) <input type="number" id="qty" min="0" step="0.0001" value="0.01"></label>
+    <div id="live-price"></div>
+    <button class="btn" id="tradeBtn">Trade</button>
+    <div id="result"></div>
+  </div>
+  <div class="panel">
+    <h3>Candles</h3>
+    <div class="tabs">
+      <button class="tab" data-sym="BTCUSDT">BTCUSDT</button>
+      <button class="tab" data-sym="ETHUSDT">ETHUSDT</button>
+      <button class="tab" data-sym="LTCUSDT">LTCUSDT</button>
+      <button class="tab" data-sym="BNBUSDT">BNBUSDT</button>
+    </div>
+    <canvas id="candles" height="280"></canvas>
+  </div>
+</div>
+<script>
+async function loadPrice(sym){
+  const r = await fetch(`/api/price?symbol=${sym}`); const j = await r.json();
+  document.getElementById('live-price').textContent = `Live price: $${(+j.price).toFixed(2)}`;
+}
+async function loadCandles(sym){
+  const res = await fetch(`/api/candles?symbol=${sym}&interval=1m`);
+  const js = await res.json();
+  const ctx = document.getElementById('candles');
+  const labels = js.candles.map(d => d.t);
+  const close = js.candles.map(d => d.c);
+  if(window.cchart) window.cchart.destroy();
+  window.cchart = new Chart(ctx, {type:'line', data:{labels, datasets:[{data:close, pointRadius:0, borderWidth:1}]},
+    options:{responsive:true, plugins:{legend:{display:false}}, scales:{x:{type:'time'}, y:{}}}});
+}
+document.querySelectorAll('.tab').forEach(b=>b.addEventListener('click',()=>{loadCandles(b.dataset.sym); loadPrice(b.dataset.sym);}));
+loadCandles('BTCUSDT'); loadPrice('BTCUSDT');
+
+document.getElementById('tradeBtn').addEventListener('click', async () => {
+  const body = new URLSearchParams({symbol: document.getElementById('symbol').value, side: document.getElementById('side').value, qty: document.getElementById('qty').value});
+  const res = await fetch('/api/trade', {method:'POST', headers:{'Content-Type':'application/x-www-form-urlencoded'}, body});
+  const j = await res.json();
+  document.getElementById('result').textContent = j.ok ? `Filled @ $${(+j.price).toFixed(2)}` : ('Error: '+j.error);
+});
+</script>
+{% endblock %}

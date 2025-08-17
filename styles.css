@@ -1,0 +1,40 @@
+:root {
+  --primary: #d3b057;
+  --bg: #0c0c0c;
+  --text: #f7f7f7;
+  --muted: #bdbdbd;
+  --card: #141414;
+  --border: #2a2a2a;
+}
+*{box-sizing:border-box} body{font-family:system-ui,-apple-system,Segoe UI,Roboto,Arial,sans-serif;margin:0;background:var(--bg);color:var(--text)}
+a{color:inherit}
+.topbar{display:flex;justify-content:space-between;align-items:center;padding:12px 16px;background:#111;color:#fff}
+.topbar .navlinks a{margin-left:12px;text-decoration:none;color:#fff;opacity:.9}
+.topbar .navlinks a:hover{opacity:1}
+.container{max-width:1000px;margin:24px auto;padding:0 16px}
+.cards{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:12px}
+.card{background:var(--card);border:1px solid var(--border);padding:12px;border-radius:10px}
+.card-title{font-weight:600;margin-bottom:8px;color:#fff}
+.price{font-size:20px;margin-bottom:6px;color:#fff}
+.btn{background:var(--primary);border:none;padding:10px 16px;border-radius:8px;cursor:pointer;color:#1a1a1a;font-weight:600;text-decoration:none;display:inline-block}
+.btn.small{padding:6px 10px;font-size:12px}
+.btn:hover{filter:brightness(.98)}
+.form{display:grid;gap:10px;max-width:520px}
+.form input,.form select,.form textarea{width:100%;padding:10px;border:1px solid var(--border);border-radius:8px;background:#0e0e0e;color:#eee}
+.form label{display:grid;gap:6px;font-size:14px}
+.flashwrap{display:grid;gap:8px;margin:8px 0 16px}
+.flash{padding:10px;border-radius:8px}
+.flash.success{background:#12391f}
+.flash.warning{background:#4a3f17}
+.flash.danger{background:#4a1b1b}
+.trade-grid{display:grid;grid-template-columns:1.2fr 1fr;gap:16px}
+.panel{background:var(--card);border:1px solid var(--border);border-radius:10px;padding:12px}
+.tabs{display:flex;gap:6px;margin-bottom:8px}
+.tab{background:#1e1e1e;border:1px solid var(--border);padding:6px 10px;border-radius:999px;cursor:pointer;color:#eee}
+.table{width:100%;border-collapse:collapse;background:#0e0e0e;color:#eee}
+.table th,.table td{border:1px solid var(--border);padding:6px 8px;font-size:14px}
+.table th{background:#161616;text-align:left}
+.cta{margin:20px 0}
+.footer{text-align:center;padding:20px;color:var(--muted)}
+.inline{display:inline-flex;gap:6px;align-items:center}
+@media (max-width:800px){.trade-grid{grid-template-columns:1fr}}

@@ -1,0 +1,9 @@
+{% extends "layout.html" %}
+{% block content %}
+<h2>Confirm your email</h2>
+<form method="post" class="form">
+  <label>Email<input type="email" name="email" value="{{ email or '' }}" required></label>
+  <label>Confirmation code<input type="text" name="code" required></label>
+  <button class="btn" type="submit">Confirm</button>
+</form>
+{% endblock %}

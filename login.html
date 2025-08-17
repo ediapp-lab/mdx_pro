@@ -1,0 +1,10 @@
+{% extends "layout.html" %}
+{% block content %}
+<h2>Log in</h2>
+<form method="post" class="form">
+  <label>Email<input type="email" name="email" required></label>
+  <label>Password<input type="password" name="password" required></label>
+  <button class="btn" type="submit">Log in</button>
+  <p>New? <a href="{{ url_for('register') }}">Register</a></p>
+</form>
+{% endblock %}
